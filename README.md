@@ -77,6 +77,8 @@ ros2 run atr_examples_py scheduler
 
 In new terminal call service:
 ```bash
+cd /home/usr/ros_workspace/src/
+source install/setup.bash
 ros2 service call /get_job_schedule atr_interfaces/srv/ComSat problem:\ \'Volvo_test_case_1_copy\'\ 
 ```
 
