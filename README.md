@@ -67,6 +67,7 @@ ros2 launch atr_examples atr_interfaces_test_launch.py
 Example usage of ATR scheduler:
 
 Launch atr_interfaces_test_launch according to above instructions
+
 In new terminal:
 ```bash
 cd /home/usr/ros_workspace/src/
@@ -79,12 +80,6 @@ In new terminal call service:
 ros2 service call /get_job_schedule atr_interfaces/srv/ComSat problem:\ \'Volvo_test_case_1_copy\'\ 
 ```
 
-
-![alt text](https://github.com/edeanl/ATR_Interfaces/blob/main/docs/Figures/atr_scenario_rviz.png "ATR scenario in Rviz")
-
-The active nodes for this demo are the following:
-
-![alt text](https://github.com/edeanl/ATR_Interfaces/blob/main/docs/Figures/rqt_nodes.png "ATR scenario nodes")
 
 ## TODO
 
