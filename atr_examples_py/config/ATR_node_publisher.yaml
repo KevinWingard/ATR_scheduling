@@ -1,0 +1,7 @@
+node_publisher:
+  info:
+    Number_of_nodes: 13
+    charging_nodes: [1,2,4]
+    hub_nodes: [12]
+  # node_coordinates:
+    
