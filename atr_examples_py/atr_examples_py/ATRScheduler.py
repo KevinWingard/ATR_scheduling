@@ -17,6 +17,9 @@ from atr_interfaces.msg import PoseWithDTime
 
 from atr_interfaces.srv import UpdateATRPathList
 
+# from ament_index_python.packages import get_package_share_directory
+
+
 from geometry_msgs.msg import Pose
 
 import json
@@ -26,6 +29,8 @@ import numpy as np
 from std_msgs.msg import String
 
 import sys, os
+
+
 sys.path.append(os.getcwd()+'/atr_examples_py/atr_examples_py/VRP') # To access VRP packages, UGLY SOLUTION, FIX SOMETIME
 from Compo_algo import Compositional
 
@@ -62,6 +67,7 @@ class SchedulerClass(Node):
         self.path_to_json=os.getcwd()+"/atr_examples_py/config/nodes_Volvo.json"
         with open(self.path_to_json,'r') as read_file:
             self.node_data = json.load(read_file)
+        self.get_logger().info("Init done!")
          
     def run_comsat(self,problem,path):
         self.get_logger().info("Running ComSat on problem: %s" % problem)
@@ -109,7 +115,7 @@ class SchedulerClass(Node):
         self.get_logger().info(response.status)
         return response
         
-    def state_subscriber_callback(self,msg):
+    def state_subscriber_callback(self,msg): # updates ATR states when available
         self.local_state_list=msg.list
         # self.get_logger().info(__file__ +'Got state list')
         return
@@ -117,6 +123,7 @@ class SchedulerClass(Node):
     def checkForAvailableATRs(self):
         # In this function, the ATR state list should be checked to see whether ATRs are available and where they are located etc.
         # Currently not used! Right now, all ATRs in the simulation are assumed to be stationary and available when publishing jobs
+
         availableATRs=[]
         for state in self.local_state_list.atr_states:
             print(f"Status for ATR {state.atr_id}: {state.mission.status}")
@@ -173,7 +180,6 @@ class SchedulerClass(Node):
         print("\nParsed edge and node sequences:")
         for atr_idx,atr in enumerate(edge_time_list.atr_node_list):
             print(f"\nATR id: {atr.atr_id}")
-            # for node_idx,node in enumerate(atr.nodes):
             for node_idx in range(len(atr.nodes)):
                 print(f"visits node: ({node_time_list.atr_node_list[atr_idx].nodes[node_idx].node}) at time: {node_time_list.atr_node_list[atr_idx].nodes[node_idx].time_step} and entering edge: ({node_time_list.atr_node_list[atr_idx].nodes[node_idx].node},{node_time_list.atr_node_list[atr_idx].nodes[node_idx+1].node}) at time: {edge_time_list.atr_node_list[atr_idx].nodes[node_idx].time_step}")
             print(f"finished at node ({node_time_list.atr_node_list[atr_idx].nodes[-1].node}) at time {node_time_list.atr_node_list[atr_idx].nodes[-1].time_step}")
@@ -226,10 +232,10 @@ class SchedulerClass(Node):
 
                     # print(x_start,y_start,x_end,y_end)
                     xtraj,ytraj = self.generateTrajBetw2Nodes(x_start,y_start,x_end,y_end,sample_t)
-                    print("traj length ",len(xtraj))
-                    print(xtraj[0],xtraj[-1])
-                    print(ytraj[0],ytraj[-1])
-                    print(f"init traj from {str(atr.nodes[index-1].node)} to {str(atr.nodes[index].node)} at time {round(time_count,2)}")
+                    # print("traj length ",len(xtraj))
+                    # print(xtraj[0],xtraj[-1])
+                    # print(ytraj[0],ytraj[-1])
+                    # print(f"init traj from {str(atr.nodes[index-1].node)} to {str(atr.nodes[index].node)} at time {round(time_count,2)}")
                     for idx,_ in enumerate(xtraj):
                         # add points from generated trajectory
                         tmp_pose=Pose()
@@ -237,13 +243,16 @@ class SchedulerClass(Node):
                         tmp_pose._position.y=float(ytraj[idx])
 
                         if idx==len(xtraj)-1: # check whether ATR should slow down for service stop or continue
-                            if index==len(node_time_list.atr_node_list[atr_idx].nodes)-1: # check if next node is last node
-                                diff_t=0.1
-                            else:
+                            if index!=len(node_time_list.atr_node_list[atr_idx].nodes)-1: # check if next node is last node
                                 diff_t=round(edge_time_list.atr_node_list[atr_idx].nodes[index].time_step-time_count,1)
-                                print('diff ',diff_t,' edgetime ',round(edge_time_list.atr_node_list[atr_idx].nodes[index].time_step,1),' time_count ',round(time_count,1))
-                            time_count+=diff_t
-                            posewithDtime.delta_time=float(diff_t)
+                                points=diff_t/sample_t
+                                print(f"diff_t {diff_t}, points {points}")
+                                posewithDtime.delta_time=sample_t
+                                posewithDtime.pose=tmp_pose
+                                for _ in range(int(points)-1):
+                                    pathwithDtime.poses.append(posewithDtime)
+                                    pose_counter+=1
+                                    time_count+=sample_t
                         else:
                             posewithDtime.delta_time=float(sample_t)
                             posewithDtime=PoseWithDTime()
@@ -296,6 +305,7 @@ class SchedulerClass(Node):
             else:
                 xtraj[i] = x_end                      # Setting the last element in lists to
                 ytraj[i] = y_end                      # to the coordinate of the end node
+        print("xtraj ",xtraj)
         return xtraj,ytraj
 
     def client_send_path_update(self,path_list):
