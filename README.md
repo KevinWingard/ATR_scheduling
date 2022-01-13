@@ -5,6 +5,8 @@ ROS2 Packages for the ATR communication interfaces
 The documentation of the project can be found here:
 <https://edeanl.github.io/ATR_Interfaces>
 
+This repo is based on https://github.com/edeanl/ATR_Interfaces
+
 ## Description
 
 This repository provides ros2 packages with the communication interfaces for the ATRs.
