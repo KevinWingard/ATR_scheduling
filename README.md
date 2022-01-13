@@ -11,6 +11,8 @@ This repository provides ros2 packages with the communication interfaces for the
 
 NOTE: Contains ComSat and ATR scheduler
 
+__The simulation is not completely flawless due to bugs probably in the ATR scheduler node (ATR_scheduling/atr_examples_py/atr_examples_py/ATRScheduler.py). The problem is probably in the discrete path generation. The ATRs make sharp turns when the same coordinates are received recurrently and also there are deviations to the generated schedule from ComSat. For future work, these bugs should be solved and also a time display should be implemented in rviz to track the elapsed time since the simulation is not executed in real-time.__
+
 The scenario includes the following modules:
 
 1. ATR Formations
