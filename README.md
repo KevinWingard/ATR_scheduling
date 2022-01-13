@@ -9,6 +9,8 @@ The documentation of the project can be found here:
 
 This repository provides ros2 packages with the communication interfaces for the ATRs.
 
+NOTE: Contains ComSat and ATR scheduler
+
 The scenario includes the following modules:
 
 1. ATR Formations
@@ -62,11 +64,24 @@ source install/setup.bash
 ros2 launch atr_examples atr_interfaces_test_launch.py
 ```
 
-![alt text](https://github.com/edeanl/ATR_Interfaces/blob/main/docs/Figures/atr_scenario_rviz.png "ATR scenario in Rviz")
+Example usage of ATR scheduler:
 
-The active nodes for this demo are the following:
+Launch atr_interfaces_test_launch according to above instructions
 
-![alt text](https://github.com/edeanl/ATR_Interfaces/blob/main/docs/Figures/rqt_nodes.png "ATR scenario nodes")
+In new terminal:
+```bash
+cd /home/usr/ros_workspace/src/
+source install/setup.bash
+ros2 run atr_examples_py scheduler 
+```
+
+In new terminal call service:
+```bash
+cd /home/usr/ros_workspace/src/
+source install/setup.bash
+ros2 service call /get_job_schedule atr_interfaces/srv/ComSat problem:\ \'Volvo_test_case_new_1\'\ 
+```
+
 
 ## TODO
 
@@ -75,8 +90,6 @@ The documentation of the modules is not complete, for now, the links point to th
 Missing modules:
 
 - Global to Discrete Pose
-- Job-based ATR Scheduler
-- Discrete to Global Pose
 - RTSP Stream
 - ROS2-Redis Bridge
   
